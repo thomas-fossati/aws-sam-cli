@@ -202,11 +202,12 @@ class LocalApigwService(BaseLocalService):
             (status_code, headers, body) = self._parse_lambda_output(
                 lambda_response, self.api.binary_media_types, request
             )
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError) as e:
             LOG.error(
                 "Function returned an invalid response (must include one of: body, headers, multiValueHeaders or "
-                "statusCode in the response object). Response received: %s",
-                lambda_response,
+                "statusCode in the response object). Response received: %s -- Logs received: %s "
+                "-- Exception: %s",
+                lambda_response, lambda_logs, e,
             )
             return ServiceErrorResponses.lambda_failure_response()
 
