@@ -57,7 +57,11 @@ def attach(docker_client, container, stdout=True, stderr=True, logs=False):
     url = "{}/containers/{}/attach".format(api_client.base_url, container.id)
 
     # Send out the attach request and read the socket for response
+    import time; time.sleep(1)
+    LOG.debug("XXX sleep 1s before attaching")
     response = api_client._post(url, headers=headers, params=query_params, stream=True)  # pylint: disable=W0212
+    time.sleep(1)
+    LOG.debug("XXX sleep 1s before reading from the attached socket")
     socket = api_client._get_raw_response_socket(response)  # pylint: disable=W0212
 
     return _read_socket(socket)
@@ -108,8 +112,9 @@ def _read_socket(socket):
             # Timeouts are normal during debug sessions and long running tasks
             LOG.debug("Ignoring docker socket timeout")
 
-        except SocketError:
+        except SocketError as e:
             # There isn't enough data in the stream. Probably the socket terminated
+            LOG.debug("There isn't enough data in the stream. Probably the socket terminated: %s, %s", e, e.args)
             break
 
 
