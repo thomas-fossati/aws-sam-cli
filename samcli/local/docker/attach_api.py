@@ -97,13 +97,13 @@ def _read_socket(socket):
         try:
 
             payload_type, payload_size = _read_header(socket)
-            LOG.debug("payload_type: %d, payload_size: %d", payload_type, payload_size)
+            LOG.debug("### payload_type: %d, payload_size: %d", payload_type, payload_size)
             if payload_size < 0:
-                LOG.debug("Something is wrong with the data stream. Payload size can't be less than zero")
+                LOG.debug("### Something is wrong with the data stream. Payload size can't be less than zero")
                 break
 
             for data in _read_payload(socket, payload_size):
-                LOG.debug("read data from socket: %s", data)
+                LOG.debug("### Read attached container data from socket: %s", data)
                 yield payload_type, data
 
         except timeout:
@@ -112,7 +112,7 @@ def _read_socket(socket):
 
         except SocketError as e:
             # There isn't enough data in the stream. Probably the socket terminated
-            LOG.debug("There isn't enough data in the stream. Probably the socket terminated: %s, %s", e, e.args)
+            LOG.debug("### There isn't enough data in the stream. Probably the socket terminated: %s, %s", e, e.args)
             break
 
 
