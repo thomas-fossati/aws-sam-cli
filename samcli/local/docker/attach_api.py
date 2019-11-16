@@ -90,6 +90,8 @@ def _read_socket(socket):
     str
         Data in the stream
     """
+    nread = 0
+    ntries = 0
 
     # Keep reading the stream until the stream terminates
     while True:
@@ -102,8 +104,10 @@ def _read_socket(socket):
                 LOG.debug("### Something is wrong with the data stream. Payload size can't be less than zero")
                 break
 
+            nread += payload_size
+
             for data in _read_payload(socket, payload_size):
-                LOG.debug("### Read attached container data from socket: %s", data)
+                LOG.debug("### Read attached container output from socket: %s", data)
                 yield payload_type, data
 
         except timeout:
@@ -113,6 +117,12 @@ def _read_socket(socket):
         except SocketError as e:
             # There isn't enough data in the stream. Probably the socket terminated
             LOG.debug("### There isn't enough data in the stream. Probably the socket terminated: %s, %s", e, e.args)
+            if nread == 0 and ntries < 5:
+                LOG.debug("### Retrying in 50ms")
+                from time import sleep
+                sleep(0.05)
+                ntries += 1
+                continue
             break
 
 
