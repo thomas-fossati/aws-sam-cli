@@ -51,14 +51,16 @@ def attach(docker_client, container, stdout=True, stderr=True, logs=False):
     # API client is a lower level Docker client that wraps the Docker APIs. It has methods that will help us
     # talk to the API directly. It is an instance of ``docker.APIClient``. We are going to use private methods of
     # class here because it is sometimes more convenient.
-    api_client = docker_client.api
+    #api_client = docker_client.api
 
     # URL where the Docker daemon is running
-    url = "{}/containers/{}/attach".format(api_client.base_url, container.id)
+    #url = "{}/containers/{}/attach".format(api_client.base_url, container.id)
 
     # Send out the attach request and read the socket for response
-    response = api_client._post(url, headers=headers, params=query_params, stream=True)  # pylint: disable=W0212
-    socket = api_client._get_raw_response_socket(response)  # pylint: disable=W0212
+    #response = api_client._post(url, headers=headers, params=query_params, stream=True)  # pylint: disable=W0212
+    #socket = api_client._get_raw_response_socket(response)  # pylint: disable=W0212
+
+    socket = docker_client.api.attach_socket(container.id, ws=True)
 
     return _read_socket(socket)
 
