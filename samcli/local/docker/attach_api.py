@@ -96,23 +96,20 @@ def _read_socket(socket):
     import asyncio
 
     # Keep reading the stream until the stream terminates
-    while True:
+    try:
+        payload_type = 1
 
-        try:
-            payload_type = 1
-
-            data = await socket.recv()
-
+        async for data in socket:
             yield payload_type, data
 
-        except timeout:
-            # Timeouts are normal during debug sessions and long running tasks
-            LOG.debug("Ignoring docker socket timeout")
+    except timeout:
+        # Timeouts are normal during debug sessions and long running tasks
+        LOG.debug("Ignoring docker socket timeout")
 
-        except SocketError as e:
-            # There isn't enough data in the stream. Probably the socket terminated
-            LOG.debug("### There isn't enough data in the stream. Probably the socket terminated: %s, %s", e, e.args)
-            break
+    except SocketError as e:
+        # There isn't enough data in the stream. Probably the socket terminated
+        LOG.debug("### There isn't enough data in the stream. Probably the socket terminated: %s, %s", e, e.args)
+        break
 
 
 def _read_payload(socket, payload_size):
